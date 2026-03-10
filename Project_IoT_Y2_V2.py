@@ -126,9 +126,7 @@ def update():
     global selected_idx, servo15_locked, global_lock
     global is_recording, start_time
 
-    # --- Debug: เช็คสถานะปุ่ม 13 และ 14 ---
-    # จะแสดงผลทุกครั้งที่ลูปทำงาน (ถ้าจอวิ่งเร็วไป ให้ลบออกหลังจากเช็คเสร็จนะครับ)
-    # print("Btn13(Gripper):", buttons[3].value(), "Btn14(Global):", buttons[4].value())
+  
 
     # 1. Global Lock
     if buttons[4].value() == 0:
@@ -186,3 +184,4 @@ def update():
         print("Replay button pressed!")
         play_replay()
         time.sleep_ms(400)
+
