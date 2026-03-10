@@ -23,10 +23,12 @@ servos = {p: PWM(Pin(p), freq=50) for p in PINS_OTHERS}
 joy1_x = ADC(Pin(4)); joy1_x.atten(ADC.ATTN_11DB)
 joy2_x = ADC(Pin(5)); joy2_x.atten(ADC.ATTN_11DB)
 
-buttons = [Pin(p, Pin.IN, Pin.PULL_UP) for p in [10,11,12,13,14]]
+# ปุ่ม 10, 11, 12, 13, 14
+buttons = [Pin(p, Pin.IN, Pin.PULL_UP) for p in [10, 11, 12, 13 , 14]]
 
-rec_btn = Pin(48, Pin.IN, Pin.PULL_UP)
-replay_btn = Pin(47, Pin.IN, Pin.PULL_UP)
+# พินตามโค้ดล่าสุดของคุณ (47 = Record, 48 = Replay)
+rec_btn = Pin(47, Pin.IN, Pin.PULL_UP)
+replay_btn = Pin(48, Pin.IN, Pin.PULL_UP)
 
 # ================= STATE =================
 selected_idx = 0
@@ -40,7 +42,7 @@ last_duty = {}
 
 cx1, cx2 = joy1_x.read(), joy2_x.read()
 
-# ================= BASIC FUNCTIONS =================
+# ================= FUNCTIONS =================
 
 def stop_all():
     servo_15.duty_u16(STOP_DUTY)
@@ -48,17 +50,11 @@ def stop_all():
         servos[p].duty_u16(STOP_DUTY)
 
 def get_duty(pin, delta):
-
     if abs(delta) < DEADZONE:
         return STOP_DUTY
-
-    if pin in [15,17]:
+    if pin in [15, 17]:
         return FAST_CW if delta > 0 else FAST_CCW
-
     return SLOW_CW if delta > 0 else SLOW_CCW
-
-
-# ================= RECORD =================
 
 def write_log(pin, duty):
 
@@ -74,9 +70,6 @@ def write_log(pin, duty):
         f.write("{},{},{}\n".format(ts, pin, duty))
 
     last_duty[pin] = duty
-
-
-# ================= REPLAY =================
 
 def play_replay():
 
@@ -112,125 +105,84 @@ def play_replay():
     stop_all()
     print("Replay Done")
 
-
-# ================= GRIPPER =================
-
 def toggle_gripper():
     global gripper_closed
-
-    if gripper_closed:
-
-        duty = RELEASE
-        servos[18].duty_u16(duty)
-        write_log(18, duty)
-
-        time.sleep_ms(350)
-
-        servos[18].duty_u16(STOP_DUTY)
-        write_log(18, STOP_DUTY)
-
-        gripper_closed = False
-        print("Gripper Open")
-
-    else:
-
-        duty = GRIP
-        servos[18].duty_u16(duty)
-        write_log(18, duty)
-
-        time.sleep_ms(350)
-
-        servos[18].duty_u16(STOP_DUTY)
-        write_log(18, STOP_DUTY)
-
-        gripper_closed = True
-        print("Gripper Close")
-
-
-# ================= START =================
+    duty = RELEASE if gripper_closed else GRIP
+    gripper_closed = not gripper_closed
+    
+    servos[18].duty_u16(duty)
+    write_log(18, duty)
+    time.sleep_ms(350)
+    servos[18].duty_u16(STOP_DUTY)
+    write_log(18, STOP_DUTY)
 
 def start_all():
     print("[HARDWARE MODE]")
     stop_all()
 
-
 # ================= UPDATE LOOP =================
 
 def update():
-
     global selected_idx, servo15_locked, global_lock
     global is_recording, start_time
 
-    # ===== GLOBAL LOCK =====
+    # --- Debug: เช็คสถานะปุ่ม 13 และ 14 ---
+    # จะแสดงผลทุกครั้งที่ลูปทำงาน (ถ้าจอวิ่งเร็วไป ให้ลบออกหลังจากเช็คเสร็จนะครับ)
+    # print("Btn13(Gripper):", buttons[3].value(), "Btn14(Global):", buttons[4].value())
+
+    # 1. Global Lock
     if buttons[4].value() == 0:
         global_lock = not global_lock
         stop_all()
+        print("Global Lock status:", global_lock)
         time.sleep_ms(300)
+    if global_lock: return
 
-    if global_lock:
-        stop_all()
-        return
-
-    # ===== SELECT SERVO =====
-    for i in [1,2]:
+    # 2. Select Servo
+    for i in [1, 2]: 
         if buttons[i].value() == 0:
             selected_idx = i - 1
+            print("Selected Servo:", PINS_OTHERS[selected_idx])
             time.sleep_ms(250)
 
-    # ===== JOYSTICK CONTROL S16/S17 =====
+    # --- JOYSTICK CONTROL ---
     current_pin = PINS_OTHERS[selected_idx]
-
     dx1 = joy1_x.read() - cx1
+    duty1 = get_duty(current_pin, dx1)
+    servos[current_pin].duty_u16(duty1)
+    write_log(current_pin, duty1)
 
-    duty = get_duty(current_pin, dx1)
-
-    servos[current_pin].duty_u16(duty)
-    write_log(current_pin, duty)
-
-    # ===== LOCK SERVO 15 =====
-    if buttons[0].value() == 0:
+    if not servo15_locked:
+        dx2 = joy2_x.read() - cx2
+        duty15 = get_duty(15, dx2)
+        servo_15.duty_u16(duty15)
+        write_log(15, duty15)
+    else:
+        servo_15.duty_u16(STOP_DUTY)
+    
+    # 3. ปุ่มกดอื่นๆ
+    if buttons[0].value() == 0: # Lock S15
         servo15_locked = not servo15_locked
+        print("Servo15 Locked:", servo15_locked)
         time.sleep_ms(300)
 
-    # ===== GRIPPER =====
-    if buttons[3].value() == 0:
+    if buttons[3].value() == 0: # Gripper (Pin 13)
+        print("Gripper button pressed!")
         toggle_gripper()
         time.sleep_ms(300)
 
-    # ===== RECORD BUTTON =====
+    # 4. Record (47)
     if rec_btn.value() == 0:
-
         is_recording = not is_recording
-
+        print("Recording:", "ON" if is_recording else "OFF")
         if is_recording:
-
-            with open(RECORD_FILE, "w") as f:
-                f.write("")
-
+            with open(RECORD_FILE, "w") as f: f.write("")
             start_time = time.ticks_ms()
             last_duty.clear()
-
-            print("Recording Start")
-
-        else:
-            print("Recording Stop")
-
         time.sleep_ms(400)
-
-    # ===== REPLAY BUTTON =====
+        
+    # 5. Replay (48)
     if replay_btn.value() == 0:
+        print("Replay button pressed!")
         play_replay()
         time.sleep_ms(400)
-
-    # ===== JOYSTICK CONTROL SERVO15 =====
-    if not servo15_locked:
-
-        dx2 = joy2_x.read() - cx2
-
-        duty = get_duty(15, dx2)
-
-        servo_15.duty_u16(duty)
-        write_log(15, duty)
-
-    else:
-        servo_15.duty_u16(STOP_DUTY)
