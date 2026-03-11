@@ -23,7 +23,6 @@ server_running = False
 server_thread = None
 
 def run_wifi_server():
-    """รัน WiFi server ในแยก"""
     global server_running
     try:
         Project_IoT_Y2_V2_wifi.start_server()
@@ -60,7 +59,7 @@ while True:
             try:
                 Project_IoT_Y2_V2_wifi.stop_all()
                 server_running = False
-                sleep(0.5)  # รอให้ server หยุดจริง ๆ
+                sleep(0.5)  
                 print("WiFi Server stopped")
             except Exception as e:
                 print("Error stopping WiFi server:", e)
