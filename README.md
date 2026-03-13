@@ -110,4 +110,4 @@ https://youtu.be/S12WYTP0wRI
 
 Pannawat   Lertkomenkul  
 Ratchanon   Laosamphan
-#### Computer Science  King Mongkut's Institute of Technology Ladkrabang
+#### Department of Computer Science,King Mongkut's Institute of Technology Ladkrabang
