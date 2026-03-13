@@ -85,14 +85,11 @@ https://youtu.be/S12WYTP0wRI
 
 | File | Description |
 |------|-----------|
-| main.py | Main control program |
+| project_iot_y2.py | Main control program |
 | mode.py | Mode control logic |
-| wifi.py | WiFi web server |
-| record.py | Record movement |
-| replay.py | Replay movement |
-| servo.py | Servo control |
-| oled.py | OLED display |
-| joystick.py | Joystick control |
+| Project_IoT_Y2_V2_wifi.py | WiFi web server |
+| test.py | OLED display |
+| Project_IoT_Y2_V2.py | Joystick control |
 
 ---
 
