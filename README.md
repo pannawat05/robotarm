@@ -93,6 +93,9 @@ https://youtu.be/S12WYTP0wRI
 
 ---
 
+## Schematics
+![Schematics]()
+
 ## Future Development
 
 - VR control support
