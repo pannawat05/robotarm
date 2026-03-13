@@ -106,6 +106,6 @@ https://youtu.be/S12WYTP0wRI
 ## Author
 
 Pannawat   Lertkomenkul  
-Ratchanon   Laosamphan \n
-Computer Science  
-King Mongkut's Institute of Technology Ladkrabang
+Ratchanon   Laosamphan
+#### Computer Science  
+#### King Mongkut's Institute of Technology Ladkrabang
