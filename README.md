@@ -94,7 +94,7 @@ https://youtu.be/S12WYTP0wRI
 ---
 
 ## Schematics
-![Schematics]()
+![Schematics](https://github.com/pannawat05/robotarm/blob/main/Schematic_robotarm.png)
 
 ## Future Development
 
