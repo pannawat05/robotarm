@@ -67,7 +67,7 @@ Robot arm can be controlled in 3 modes:
 ### [Watch this video on YouTube](https://youtu.be/S12WYTP0wRI)
 
 
-### [Slide]([https://youtu.be/S12WYTP0wRI](https://1drv.ms/p/c/b1be4b1a3bdb483a/IQCY_vCY0aerTYscldrCbHtiAX9ekC0YXBMc-wzQp-v9esw))
+### [![Slide](https://1drv.ms/p/c/b1be4b1a3bdb483a/IQCY_vCY0aerTYscldrCbHtiAX9ekC0YXBMc-wzQp-v9esw))]
 
 
 
